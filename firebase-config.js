@@ -1,5 +1,12 @@
-// Cole aqui a configuração do seu projeto Firebase (veja o README.md, passo 3).
-const firebaseConfig = {  
+npm install firebase
+
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
   apiKey: "AIzaSyA35zpJgEi0YkADMqhWlxLoWejngyk_fZ0",
   authDomain: "perfumes-79943.firebaseapp.com",
   projectId: "perfumes-79943",
@@ -7,3 +14,6 @@ const firebaseConfig = {
   messagingSenderId: "310908192287",
   appId: "1:310908192287:web:4247e4afba62850f39b72a"
 };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
