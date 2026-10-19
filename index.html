@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Perfumes">
+<meta name="theme-color" content="#1f1a2e">
+<title>Meus Perfumes</title>
+<style>
+  :root{--bg:#f6f4f9;--card:#fff;--txt:#1f1a2e;--mut:#6b6580;--pri:#6d3fc4;--bd:#e3dfec;--danger:#c23b3b}
+  @media (prefers-color-scheme:dark){:root{--bg:#14111d;--card:#1f1a2e;--txt:#f1eef8;--mut:#a39cb8;--pri:#9a77e8;--bd:#332c47;--danger:#ff6b6b}}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--txt);padding-bottom:90px}
+  header{position:sticky;top:0;z-index:5;background:var(--bg);padding:max(12px,env(safe-area-inset-top)) 16px 10px;border-bottom:1px solid var(--bd)}
+  h1{margin:0 0 8px;font-size:1.3rem}
+  input,select,textarea,button{font:inherit;color:inherit}
+  .search{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--bd);background:var(--card)}
+  main{padding:14px 16px;max-width:760px;margin:auto}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .item{background:var(--card);border:1px solid var(--bd);border-radius:14px;overflow:hidden;cursor:pointer}
+  .item img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:var(--bd)}
+  .item div{padding:8px 10px}
+  .item b{display:block;font-size:.95rem}
+  .item small{color:var(--mut)}
+  .empty{text-align:center;color:var(--mut);margin-top:50px}
+  .fab{position:fixed;right:18px;bottom:max(18px,env(safe-area-inset-bottom));width:60px;height:60px;border-radius:50%;border:0;background:var(--pri);color:#fff;font-size:2rem;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+  .sheet{position:fixed;inset:0;background:var(--bg);overflow-y:auto;display:none;z-index:10;padding:max(14px,env(safe-area-inset-top)) 16px 40px}
+  .sheet.open{display:block}
+  .sheet .in{max-width:640px;margin:auto}
+  label{display:block;margin:14px 0 5px;font-size:.85rem;color:var(--mut);font-weight:600}
+  label .req{color:var(--danger)}
+  .f{width:100%;padding:12px;border-radius:10px;border:1px solid var(--bd);background:var(--card)}
+  textarea.f{min-height:70px;resize:vertical}
+  .row{display:flex;gap:10px}.row>*{flex:1}
+  .btn{padding:13px 18px;border-radius:12px;border:0;background:var(--pri);color:#fff;font-weight:600}
+  .btn.sec{background:var(--card);color:var(--txt);border:1px solid var(--bd)}
+  .btn.del{background:var(--danger)}
+  .actions{display:flex;gap:10px;margin-top:22px}.actions .btn{flex:1}
+  .photo{width:100%;aspect-ratio:1;max-height:320px;border:2px dashed var(--bd);border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--mut);overflow:hidden;background:var(--card);cursor:pointer}
+  .photo img{width:100%;height:100%;object-fit:cover}
+  .dl dt{font-size:.78rem;color:var(--mut);margin-top:12px;font-weight:600}
+  .dl dd{margin:2px 0 0;font-size:1rem}
+  .detail-img{width:100%;border-radius:14px;max-height:380px;object-fit:cover}
+  .tools{display:flex;gap:8px;margin-top:8px}
+  .tools .btn{padding:8px 12px;font-size:.8rem}
+  .err{color:var(--danger);font-size:.85rem;margin-top:8px;min-height:1em}
+</style>
+</head>
+<body>
+<header>
+  <h1>🧴 Meus Perfumes</h1>
+  <input id="busca" class="search" type="search" placeholder="Buscar por nome, marca, notas…">
+  <div class="tools">
+    <button class="btn sec" id="exp">⬇ Exportar backup</button>
+    <button class="btn sec" id="imp">⬆ Importar backup</button>
+    <input type="file" id="impFile" accept="application/json" hidden>
+  </div>
+</header>
+<main><div id="lista"></div></main>
+<button class="fab" id="novo" aria-label="Adicionar perfume">+</button>
+
+<!-- Formulário -->
+<div class="sheet" id="form"><div class="in">
+  <h2 id="formTit">Novo perfume</h2>
+  <label>Foto do perfume <span class="req">*</span></label>
+  <div class="photo" id="photoBox">Toque para escolher / tirar foto</div>
+  <input type="file" id="foto" accept="image/*" hidden>
+
+  <label>Nome do perfume <span class="req">*</span></label>
+  <input class="f" id="nome" autocomplete="off">
+
+  <label>Marca e linha</label>
+  <input class="f" id="marca" autocomplete="off">
+
+  <label>Versão ou edição</label>
+  <input class="f" id="versao" autocomplete="off" placeholder="Ex.: Eau de Parfum, Intense, Edição limitada">
+
+  <div class="row">
+    <div><label>Gênero indicado</label>
+      <select class="f" id="genero"><option value="">—</option><option>Masculino</option><option>Feminino</option><option>Unissex</option></select></div>
+    <div><label>Volume</label>
+      <select class="f" id="volume"><option value="">—</option><option>30ml</option><option>50ml</option><option>75ml</option><option>100ml</option><option>200ml</option></select></div>
+  </div>
+
+  <label>Fabricante ou distribuidor</label>
+  <input class="f" id="fab" autocomplete="off">
+
+  <div class="row">
+    <div><label>Preço de compra (R$)</label><input class="f" id="preco" inputmode="decimal" placeholder="0,00"></div>
+    <div><label>Frete e impostos (R$)</label><input class="f" id="frete" inputmode="decimal" placeholder="0,00"></div>
+  </div>
+
+  <label>Fragrâncias que ele utiliza</label>
+  <textarea class="f" id="notas" placeholder="Ex.: bergamota, lavanda, âmbar, baunilha"></textarea>
+
+  <label>Parecido com qual perfume</label>
+  <input class="f" id="similar" autocomplete="off">
+
+  <div class="err" id="err"></div>
+  <div class="actions">
+    <button class="btn sec" id="cancelar">Cancelar</button>
+    <button class="btn" id="salvar">Salvar</button>
+  </div>
+</div></div>
+
+<!-- Detalhe -->
+<div class="sheet" id="det"><div class="in">
+  <div id="detBody"></div>
+  <div class="actions">
+    <button class="btn sec" id="fechar">Voltar</button>
+    <button class="btn" id="editar">Editar</button>
+    <button class="btn del" id="apagar">Excluir</button>
+  </div>
+</div></div>
+
+<script>
+const KEY='perfumes_v1';
+const $=id=>document.getElementById(id);
+let dados=[],fotoAtual='',editId=null,detId=null;
+
+function carregar(){try{dados=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){dados=[]}}
+function gravar(){
+  try{localStorage.setItem(KEY,JSON.stringify(dados));return true}
+  catch(e){alert('Sem espaço no navegador. Exporte um backup e apague itens antigos.');return false}
+}
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const brl=v=>v===''||v==null?'—':'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const num=s=>{s=String(s).trim().replace(/\./g,'').replace(',','.');return s===''?'':(isNaN(+s)?'':+s)};
+
+function render(){
+  const q=$('busca').value.toLowerCase().trim();
+  const l=dados.filter(p=>!q||[p.nome,p.marca,p.versao,p.fab,p.notas,p.similar].join(' ').toLowerCase().includes(q));
+  $('lista').innerHTML=l.length?`<div class="grid">${l.map(p=>`
+    <div class="item" data-id="${p.id}">
+      <img src="${p.foto}" alt="">
+      <div><b>${esc(p.nome)}</b><small>${esc(p.marca||'')}${p.volume?' · '+esc(p.volume):''}</small></div>
+    </div>`).join('')}</div>`
+    :`<div class="empty">${dados.length?'Nada encontrado.':'Nenhum perfume ainda.<br>Toque no + para adicionar.'}</div>`;
+}
+
+// compressão da foto
+function comprimir(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onerror=rej;
+    r.onload=()=>{
+      const img=new Image();
+      img.onerror=rej;
+      img.onload=()=>{
+        const M=700,s=Math.min(1,M/Math.max(img.width,img.height));
+        const c=document.createElement('canvas');
+        c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);
+        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+        res(c.toDataURL('image/jpeg',.78));
+      };
+      img.src=r.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+function abrirForm(p){
+  editId=p?p.id:null;
+  $('formTit').textContent=p?'Editar perfume':'Novo perfume';
+  $('nome').value=p?.nome||'';$('marca').value=p?.marca||'';$('versao').value=p?.versao||'';
+  $('genero').value=p?.genero||'';$('volume').value=p?.volume||'';$('fab').value=p?.fab||'';
+  $('preco').value=p&&p.preco!==''?String(p.preco).replace('.',','):'';
+  $('frete').value=p&&p.frete!==''?String(p.frete).replace('.',','):'';
+  $('notas').value=p?.notas||'';$('similar').value=p?.similar||'';
+  fotoAtual=p?.foto||'';mostrarFoto();$('err').textContent='';
+  $('form').classList.add('open');$('form').scrollTop=0;
+}
+function mostrarFoto(){$('photoBox').innerHTML=fotoAtual?`<img src="${fotoAtual}">`:'Toque para escolher / tirar foto'}
+
+function abrirDet(id){
+  const p=dados.find(x=>x.id===id);if(!p)return;detId=id;
+  const li=(t,v)=>v?`<dt>${t}</dt><dd>${esc(v)}</dd>`:'';
+  const total=(p.preco===''&&p.frete==='')?'':brl((+p.preco||0)+(+p.frete||0));
+  $('detBody').innerHTML=`<img class="detail-img" src="${p.foto}">
+    <h2 style="margin-bottom:0">${esc(p.nome)}</h2>
+    <dl class="dl">
+      ${li('Marca e linha',p.marca)}${li('Versão ou edição',p.versao)}${li('Gênero indicado',p.genero)}
+      ${li('Volume',p.volume)}${li('Fabricante / distribuidor',p.fab)}
+      <dt>Preço de compra</dt><dd>${brl(p.preco)}</dd>
+      <dt>Frete e impostos</dt><dd>${brl(p.frete)}</dd>
+      ${total?`<dt>Custo total</dt><dd><b>${total}</b></dd>`:''}
+      ${li('Fragrâncias',p.notas)}${li('Parecido com',p.similar)}
+    </dl>`;
+  $('det').classList.add('open');$('det').scrollTop=0;
+}
+
+$('novo').onclick=()=>abrirForm();
+$('cancelar').onclick=()=>$('form').classList.remove('open');
+$('fechar').onclick=()=>$('det').classList.remove('open');
+$('photoBox').onclick=()=>$('foto').click();
+$('foto').onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{fotoAtual=await comprimir(f);mostrarFoto();$('err').textContent=''}
+  catch{$('err').textContent='Não foi possível ler essa imagem.'}
+  e.target.value='';
+};
+$('lista').onclick=e=>{const it=e.target.closest('.item');if(it)abrirDet(it.dataset.id)};
+$('busca').oninput=render;
+$('editar').onclick=()=>{const p=dados.find(x=>x.id===detId);$('det').classList.remove('open');abrirForm(p)};
+$('apagar').onclick=()=>{
+  if(!confirm('Excluir este perfume?'))return;
+  dados=dados.filter(x=>x.id!==detId);gravar();$('det').classList.remove('open');render();
+};
+$('salvar').onclick=()=>{
+  const nome=$('nome').value.trim();
+  if(!nome){$('err').textContent='Informe o nome do perfume.';return}
+  if(!fotoAtual){$('err').textContent='Adicione a foto do perfume.';return}
+  const p={id:editId||Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+    nome,foto:fotoAtual,marca:$('marca').value.trim(),versao:$('versao').value.trim(),
+    genero:$('genero').value,volume:$('volume').value,fab:$('fab').value.trim(),
+    preco:num($('preco').value),frete:num($('frete').value),
+    notas:$('notas').value.trim(),similar:$('similar').value.trim()};
+  const antes=JSON.stringify(dados);
+  if(editId)dados=dados.map(x=>x.id===editId?p:x);else dados.unshift(p);
+  if(!gravar()){dados=JSON.parse(antes);return}
+  $('form').classList.remove('open');render();
+};
+
+// backup
+$('exp').onclick=()=>{
+  const b=new Blob([JSON.stringify(dados)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);
+  a.download='perfumes-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+};
+$('imp').onclick=()=>$('impFile').click();
+$('impFile').onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{
+    const arr=JSON.parse(await f.text());
+    if(!Array.isArray(arr))throw 0;
+    const ids=new Set(dados.map(x=>x.id));
+    const novos=arr.filter(x=>x&&x.id&&x.nome&&x.foto&&!ids.has(x.id));
+    dados=[...novos,...dados];
+    if(gravar()){render();alert(novos.length+' perfume(s) importado(s).')}
+  }catch{alert('Arquivo de backup inválido.')}
+  e.target.value='';
+};
+
+carregar();render();
+</script>
+</body>
+</html>
