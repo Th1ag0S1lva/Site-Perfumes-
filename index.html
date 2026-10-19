@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Perfumes">
+<meta name="theme-color" content="#f3f0e9">
+<title>Perfumes</title>
+<style>
+  :root{
+    --bg:#f3f0e9;--card:#faf8f3;--txt:#1e1c19;--mut:#7a7469;--bd:#d9d3c6;
+    --btn-bg:#1e1c19;--btn-fg:#f3f0e9;--danger:#a3322a;
+    --serif:Georgia,"Iowan Old Style","Times New Roman",serif;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#171513;--card:#1f1c19;--txt:#ece7dc;--mut:#9b9385;--bd:#36312b;
+    --btn-bg:#ece7dc;--btn-fg:#171513;--danger:#e0786f;
+  }}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  [hidden]{display:none!important}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--txt);padding-bottom:84px;line-height:1.4}
+  input,select,textarea,button{font:inherit;color:inherit}
+  header{padding:max(16px,env(safe-area-inset-top)) 16px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:baseline;justify-content:space-between;gap:12px;max-width:760px;margin:auto}
+  h1{margin:0;font-family:var(--serif);font-weight:400;font-size:1.6rem;letter-spacing:.01em}
+  h2{font-family:var(--serif);font-weight:400;font-size:1.5rem;margin:8px 0 4px}
+  nav{display:flex;gap:16px;font-size:.85rem}
+  a,.link{color:var(--txt);text-decoration:underline;text-underline-offset:3px;background:none;border:0;padding:0;font-size:inherit;cursor:pointer}
+  main{padding:16px;max-width:760px;margin:auto}
+  .search{width:100%;padding:10px 0;border:0;border-bottom:1px solid var(--txt);border-radius:0;background:transparent;outline:none}
+  .minitools{display:flex;gap:16px;margin:10px 0 18px;font-size:.8rem;color:var(--mut)}
+  .minitools .link{color:var(--mut)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:20px 14px}
+  .item{cursor:pointer}
+  .item img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:var(--card);border:1px solid var(--bd)}
+  .item b{display:block;font-family:var(--serif);font-weight:400;font-size:1.02rem;margin-top:7px}
+  .item small{display:block;color:var(--mut);font-size:.76rem;letter-spacing:.04em;text-transform:uppercase}
+  .item .pr{color:var(--txt);text-transform:none;letter-spacing:0;font-size:.85rem;margin-top:1px}
+  .empty{color:var(--mut);margin:40px 0;text-align:center}
+  .barra{position:fixed;left:0;right:0;bottom:0;padding:10px 16px max(10px,env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--bd)}
+  .barra .btn{display:block;width:100%;max-width:728px;margin:auto}
+  .sheet{position:fixed;inset:0;background:var(--bg);overflow-y:auto;display:none;z-index:10;padding:max(14px,env(safe-area-inset-top)) 16px 40px}
+  .sheet.open{display:block}
+  .sheet .in{max-width:640px;margin:auto}
+  label{display:block;margin:20px 0 2px;font-size:.7rem;letter-spacing:.09em;text-transform:uppercase;color:var(--mut)}
+  .f{width:100%;padding:9px 2px;border:0;border-bottom:1px solid var(--bd);border-radius:0;background:transparent;outline:none}
+  .f:focus{border-bottom-color:var(--txt)}
+  textarea.f{min-height:64px;resize:vertical;border:1px solid var(--bd);padding:8px;margin-top:4px}
+  select.f{padding-left:0}
+  .row{display:flex;gap:14px}.row>*{flex:1}
+  .row .w2{flex:2}
+  .btn{padding:12px 18px;border-radius:3px;border:1px solid var(--btn-bg);background:var(--btn-bg);color:var(--btn-fg);font-weight:600;letter-spacing:.02em;cursor:pointer}
+  .btn:disabled{opacity:.5}
+  .btn.sec{background:transparent;color:var(--txt);border-color:var(--bd)}
+  .btn.del{background:transparent;color:var(--danger);border-color:var(--danger)}
+  .btn.sm{padding:7px 11px;font-size:.8rem}
+  .actions{display:flex;gap:10px;margin-top:26px}.actions .btn{flex:1}
+  .photo{width:100%;aspect-ratio:4/5;max-height:340px;border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;color:var(--mut);overflow:hidden;background:var(--card);cursor:pointer;font-size:.9rem}
+  .photo img{width:100%;height:100%;object-fit:cover}
+  .dl{margin:14px 0 0}
+  .dl dt{font-size:.7rem;letter-spacing:.09em;text-transform:uppercase;color:var(--mut);margin-top:16px}
+  .dl dd{margin:2px 0 0}
+  .dl small{color:var(--mut)}
+  .detail-img{width:100%;max-height:420px;object-fit:cover;border:1px solid var(--bd);display:block}
+  .conv{font-size:.8rem;color:var(--mut);min-height:1.1em;margin-top:3px}
+  .taxa{font-size:.78rem;color:var(--mut);margin-top:6px}
+  .err{color:var(--danger);font-size:.85rem;margin-top:10px;min-height:1em}
+  .login{max-width:360px;margin:14vh auto 0;padding:0 16px}
+  .muted{color:var(--mut);font-size:.9rem}
+  .banner{border:1px solid var(--bd);padding:12px;margin-bottom:16px;font-size:.88rem}
+  .setup{padding:24px;max-width:560px;margin:auto}
+  code{background:var(--card);border:1px solid var(--bd);padding:1px 5px}
+  .tr{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--bd)}
+  .tr img{width:56px;height:70px;object-fit:cover;border:1px solid var(--bd);flex:none}
+  .tr .tx{flex:1;min-width:0}
+  .tr .tx b{font-family:var(--serif);font-weight:400;display:block}
+  .tr .tx small{color:var(--mut)}
+  .tr .ac{display:flex;flex-direction:column;gap:6px}
+</style>
+</head>
+<body>
+
+<div id="setup" class="setup" hidden>
+  <h2>Falta configurar o banco de dados</h2>
+  <p>Abra o arquivo <code>firebase-config.js</code> e cole os dados do seu projeto Firebase. O passo a passo está no <code>README.md</code>.</p>
+</div>
+
+<!-- Login -->
+<div id="loginView" class="login" hidden>
+  <h1>Perfumes</h1>
+  <p class="muted">Entre com o e-mail e a senha compartilhados.</p>
+  <label>E-mail</label>
+  <input class="f" id="lEmail" type="email" autocomplete="username">
+  <label>Senha</label>
+  <input class="f" id="lSenha" type="password" autocomplete="current-password">
+  <div class="err" id="lErr"></div>
+  <div class="actions"><button class="btn" id="lBtn">Entrar</button></div>
+</div>
+
+<!-- App -->
+<div id="appView" hidden>
+  <header>
+    <h1>Perfumes</h1>
+    <nav>
+      <a href="#/lixeira" id="navLixo">Lixeira (<span id="nLixo">0</span>)</a>
+      <a href="#/" id="navVoltar" hidden>Voltar</a>
+      <button class="link" id="sair">Sair</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="vLista">
+      <input id="busca" class="search" type="search" placeholder="Buscar por nome, marca ou notas">
+      <div class="minitools">
+        <button class="link" id="exp">Exportar backup</button>
+        <button class="link" id="imp">Importar backup</button>
+        <input type="file" id="impFile" accept="application/json" hidden>
+      </div>
+      <div id="migra" class="banner" hidden>
+        Há <b id="migraN">0</b> perfume(s) salvos só neste aparelho, da versão anterior.
+        <div style="margin-top:8px"><button class="btn sm" id="migraBtn">Enviar para a nuvem</button></div>
+      </div>
+      <div id="lista"><div class="empty">Carregando…</div></div>
+    </section>
+
+    <section id="vLixeira" hidden>
+      <h2>Lixeira</h2>
+      <p class="muted">Os itens abaixo só somem de verdade quando você apagar daqui.</p>
+      <div id="listaLixo"></div>
+      <div class="actions" id="boxEsvaziar" hidden>
+        <button class="btn del" id="esvaziar">Esvaziar lixeira</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="barra" id="barra"><button class="btn" id="novo">Adicionar perfume</button></div>
+</div>
+
+<!-- Formulário -->
+<div class="sheet" id="form"><div class="in">
+  <h2 id="formTit">Novo perfume</h2>
+
+  <label>Foto do perfume *</label>
+  <div class="photo" id="photoBox">Nenhuma foto ainda</div>
+  <div class="row" style="margin-top:10px">
+    <button type="button" class="btn sec" id="btnCam">Tirar foto</button>
+    <button type="button" class="btn sec" id="btnGal">Escolher da galeria</button>
+  </div>
+  <input type="file" id="fotoCam" accept="image/*" capture="environment" hidden>
+  <input type="file" id="fotoGal" accept="image/*" hidden>
+
+  <label>Nome do perfume *</label>
+  <input class="f" id="nome" autocomplete="off">
+  <button type="button" class="link" id="btnWeb" style="margin-top:8px;font-size:.8rem">Pesquisar este perfume na web</button>
+
+  <label>Marca e linha</label>
+  <input class="f" id="marca" autocomplete="off">
+
+  <label>Versão ou edição</label>
+  <input class="f" id="versao" autocomplete="off" placeholder="Eau de Parfum, Intense, edição limitada…">
+
+  <div class="row">
+    <div><label>Gênero indicado</label>
+      <select class="f" id="genero"><option value="">—</option><option>Masculino</option><option>Feminino</option><option>Unissex</option></select></div>
+    <div><label>Volume</label>
+      <select class="f" id="volume"><option value="">—</option><option>30ml</option><option>50ml</option><option>75ml</option><option>100ml</option><option>200ml</option></select></div>
+  </div>
+
+  <label>Fabricante ou distribuidor</label>
+  <input class="f" id="fab" autocomplete="off">
+
+  <label>Preço de compra</label>
+  <div class="row">
+    <input class="f w2" id="preco" inputmode="decimal" placeholder="0,00">
+    <select class="f" id="precoMoeda"><option value="USD">USD</option><option value="BRL">BRL</option><option value="PYG">PYG</option></select>
+  </div>
+  <div class="conv" id="precoConv"></div>
+
+  <label>Frete e impostos</label>
+  <div class="row">
+    <input class="f w2" id="frete" inputmode="decimal" placeholder="0,00">
+    <select class="f" id="freteMoeda"><option value="BRL">BRL</option><option value="USD">USD</option><option value="PYG">PYG</option></select>
+  </div>
+  <div class="conv" id="freteConv"></div>
+  <div class="taxa" id="taxaInfo"></div>
+
+  <label>Fragrâncias que ele utiliza</label>
+  <textarea class="f" id="notas" placeholder="Bergamota, lavanda, âmbar, baunilha…"></textarea>
+
+  <label>Parecido com qual perfume</label>
+  <input class="f" id="similar" autocomplete="off">
+
+  <div class="err" id="err"></div>
+  <div class="actions">
+    <button class="btn sec" id="cancelar">Cancelar</button>
+    <button class="btn" id="salvar">Salvar</button>
+  </div>
+</div></div>
+
+<!-- Detalhe -->
+<div class="sheet" id="det"><div class="in">
+  <div id="detBody"></div>
+  <div class="actions">
+    <button class="btn sec" id="fechar">Voltar</button>
+    <button class="btn" id="editar">Editar</button>
+    <button class="btn del" id="apagar">Lixeira</button>
+  </div>
+</div></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=s=>{s=String(s).trim().replace(/\./g,'').replace(',','.');return s===''?'':(isNaN(+s)?'':+s)};
+const LOCAL_KEY='perfumes_v1';
+const SIMB={USD:'US$',BRL:'R$',PYG:'Gs.'};
+
+let dados=[],fotoAtual='',editId=null,detId=null,unsub=null,db,auth,col,taxas=null;
+
+/* ---------- moeda ---------- */
+function fmt(m,v){
+  if(v===''||v==null||isNaN(v))return '—';
+  if(m==='PYG')return 'Gs. '+Math.round(v).toLocaleString('pt-BR');
+  return SIMB[m]+' '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+// taxas = unidades de BRL e de PYG por 1 USD
+function pygPorBRL(){return taxas?taxas.PYG/taxas.BRL:null}
+function converter(v,m){
+  if(v===''||v==null)return null;
+  let brl;
+  if(m==='BRL')brl=v;
+  else if(!taxas)return null;
+  else brl=m==='USD'?v*taxas.BRL:v*(taxas.BRL/taxas.PYG);
+  brl=Math.round(brl*100)/100;
+  const t=pygPorBRL();
+  const pyg=m==='PYG'?v:(t?Math.round(brl*t):null);
+  return {brl,pyg};
+}
+async function carregarTaxas(){
+  let c=null;
+  try{c=JSON.parse(localStorage.getItem('taxas_v1')||'null')}catch{}
+  if(c&&Date.now()-c.t<6*3600e3){taxas=c.r;taxaUI();return}
+  try{
+    const r=await fetch('https://open.er-api.com/v6/latest/USD');
+    const j=await r.json();
+    if(j.rates&&j.rates.BRL&&j.rates.PYG){
+      taxas={BRL:j.rates.BRL,PYG:j.rates.PYG};
+      localStorage.setItem('taxas_v1',JSON.stringify({t:Date.now(),r:taxas}));
+    }else throw 0;
+  }catch{if(c)taxas=c.r}
+  taxaUI();
+}
+function taxaUI(){
+  $('taxaInfo').textContent=taxas
+    ?`Cotação: US$ 1 = ${fmt('BRL',taxas.BRL)} · R$ 1 = ${fmt('PYG',pygPorBRL())}`
+    :'Cotação indisponível no momento.';
+  previa();render();
+}
+function previa(){
+  [['preco','precoMoeda','precoConv'],['frete','freteMoeda','freteConv']].forEach(([i,m,o])=>{
+    const v=num($(i).value);
+    if(v===''){$(o).textContent='';return}
+    const c=converter(v,$(m).value);
+    $(o).textContent=c?'= '+fmt('BRL',c.brl)+(c.pyg!=null?'  ·  '+fmt('PYG',c.pyg):''):'Sem cotação no momento.';
+  });
+}
+function valores(p,c){
+  const v=p[c];
+  if(v===''||v==null)return null;
+  const m=p[c+'Moeda']||'BRL';
+  let brl=p[c+'BRL'],pyg=p[c+'PYG'];
+  if(brl==null){const k=converter(v,m);if(k){brl=k.brl;pyg=k.pyg}}
+  else if(pyg==null){const t=pygPorBRL();if(t)pyg=Math.round(brl*t)}
+  return {v,m,brl,pyg};
+}
+
+/* ---------- Firebase ---------- */
+const cfg=window.FIREBASE_CONFIG||{};
+if(!cfg.apiKey||String(cfg.apiKey).startsWith('COLE')){
+  $('setup').hidden=false;
+}else{
+  firebase.initializeApp(cfg);
+  auth=firebase.auth();
+  db=firebase.firestore();
+  db.enablePersistence({synchronizeTabs:true}).catch(()=>{});
+  col=db.collection('perfumes');
+  auth.onAuthStateChanged(u=>{
+    if(u){
+      $('loginView').hidden=true;$('appView').hidden=false;
+      iniciar();
+    }else{
+      if(unsub){unsub();unsub=null}
+      dados=[];
+      $('appView').hidden=true;$('loginView').hidden=false;
+    }
+  });
+}
+
+function iniciar(){
+  if(unsub)unsub();
+  unsub=col.orderBy('createdAt','desc').onSnapshot(s=>{
+    dados=s.docs.map(d=>({id:d.id,...d.data({serverTimestamps:'estimate'})}));
+    render();
+  },e=>{
+    $('lista').innerHTML='<div class="empty">Erro ao carregar: '+esc(e.message)+'</div>';
+  });
+  checarMigracao();
+  carregarTaxas();
+  rota();
+}
+
+$('lBtn').onclick=async()=>{
+  $('lErr').textContent='';$('lBtn').disabled=true;
+  try{await auth.signInWithEmailAndPassword($('lEmail').value.trim(),$('lSenha').value)}
+  catch(e){$('lErr').textContent='E-mail ou senha incorretos.'}
+  $('lBtn').disabled=false;
+};
+$('lSenha').onkeydown=e=>{if(e.key==='Enter')$('lBtn').click()};
+$('sair').onclick=()=>auth.signOut();
+
+/* ---------- rotas (#/lixeira) ---------- */
+function rota(){
+  const t=location.hash==='#/lixeira';
+  $('vLista').hidden=t;$('vLixeira').hidden=!t;
+  $('barra').hidden=t;
+  $('navLixo').hidden=t;$('navVoltar').hidden=!t;
+  render();
+}
+window.addEventListener('hashchange',rota);
+
+/* ---------- listas ---------- */
+function render(){
+  const ativos=dados.filter(p=>!p.deletedAt);
+  const lixo=dados.filter(p=>p.deletedAt);
+  $('nLixo').textContent=lixo.length;
+
+  const q=$('busca').value.toLowerCase().trim();
+  const l=ativos.filter(p=>!q||[p.nome,p.marca,p.versao,p.fab,p.notas,p.similar].join(' ').toLowerCase().includes(q));
+  $('lista').innerHTML=l.length?`<div class="grid">${l.map(p=>{
+    const v=valores(p,'preco');
+    return `<div class="item" data-id="${p.id}">
+      <img src="${p.foto}" alt="" loading="lazy">
+      <b>${esc(p.nome)}</b>
+      <small>${esc(p.marca||'')}${p.marca&&p.volume?' · ':''}${esc(p.volume||'')}</small>
+      ${v&&v.brl!=null?`<small class="pr">${fmt('BRL',v.brl)}</small>`:''}
+    </div>`}).join('')}</div>`
+    :`<div class="empty">${ativos.length?'Nada encontrado.':'Nada cadastrado ainda.'}</div>`;
+
+  $('listaLixo').innerHTML=lixo.length?lixo.map(p=>{
+    const d=p.deletedAt&&p.deletedAt.toDate?p.deletedAt.toDate().toLocaleDateString('pt-BR'):'';
+    return `<div class="tr" data-id="${p.id}">
+      <img src="${p.foto}" alt="">
+      <div class="tx"><b>${esc(p.nome)}</b><small>${esc(p.marca||'')}${d?' · excluído em '+d:''}</small></div>
+      <div class="ac">
+        <button class="btn sec sm" data-a="rest">Restaurar</button>
+        <button class="btn del sm" data-a="del">Apagar</button>
+      </div></div>`}).join('')
+    :'<div class="empty">A lixeira está vazia.</div>';
+  $('boxEsvaziar').hidden=!lixo.length;
+}
+
+$('listaLixo').onclick=async e=>{
+  const b=e.target.closest('button');if(!b)return;
+  const id=b.closest('.tr').dataset.id;
+  try{
+    if(b.dataset.a==='rest')await col.doc(id).update({deletedAt:firebase.firestore.FieldValue.delete()});
+    else if(b.dataset.a==='del'){
+      if(confirm('Apagar de vez? Não dá para desfazer.'))await col.doc(id).delete();
+    }
+  }catch(err){alert('Erro: '+err.message)}
+};
+$('esvaziar').onclick=async()=>{
+  const lixo=dados.filter(p=>p.deletedAt);
+  if(!lixo.length||!confirm('Apagar '+lixo.length+' item(ns) de vez? Não dá para desfazer.'))return;
+  try{
+    for(let i=0;i<lixo.length;i+=400){
+      const b=db.batch();
+      lixo.slice(i,i+400).forEach(p=>b.delete(col.doc(p.id)));
+      await b.commit();
+    }
+  }catch(err){alert('Erro: '+err.message)}
+};
+
+/* ---------- foto ---------- */
+function comprimir(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onerror=rej;
+    r.onload=()=>{
+      const img=new Image();
+      img.onerror=rej;
+      img.onload=()=>{
+        const M=640,s=Math.min(1,M/Math.max(img.width,img.height));
+        const c=document.createElement('canvas');
+        c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);
+        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+        res(c.toDataURL('image/jpeg',.74));
+      };
+      img.src=r.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+function mostrarFoto(){$('photoBox').innerHTML=fotoAtual?`<img src="${fotoAtual}">`:'Nenhuma foto ainda'}
+$('btnCam').onclick=()=>$('fotoCam').click();
+$('btnGal').onclick=()=>$('fotoGal').click();
+$('photoBox').onclick=()=>$('fotoGal').click();
+async function aoEscolherFoto(e){
+  const f=e.target.files[0];if(!f)return;
+  try{fotoAtual=await comprimir(f);mostrarFoto();$('err').textContent=''}
+  catch{$('err').textContent='Não foi possível ler essa imagem.'}
+  e.target.value='';
+}
+$('fotoCam').onchange=aoEscolherFoto;
+$('fotoGal').onchange=aoEscolherFoto;
+$('btnWeb').onclick=()=>{
+  const n=$('nome').value.trim();
+  if(!n){$('err').textContent='Digite o nome do perfume para pesquisar.';return}
+  $('err').textContent='';
+  window.open('https://www.google.com/search?q='+encodeURIComponent(n+' perfume fragrantica notas'),'_blank');
+};
+
+/* ---------- formulário ---------- */
+['preco','frete'].forEach(i=>$(i).addEventListener('input',previa));
+['precoMoeda','freteMoeda'].forEach(i=>$(i).addEventListener('change',previa));
+
+function abrirForm(p){
+  editId=p?p.id:null;
+  $('formTit').textContent=p?'Editar perfume':'Novo perfume';
+  $('nome').value=p?.nome||'';$('marca').value=p?.marca||'';$('versao').value=p?.versao||'';
+  $('genero').value=p?.genero||'';$('volume').value=p?.volume||'';$('fab').value=p?.fab||'';
+  const pv=v=>v!==''&&v!=null?String(v).replace('.',','):'';
+  $('preco').value=pv(p?.preco);$('precoMoeda').value=p?.precoMoeda||(p?'BRL':'USD');
+  $('frete').value=pv(p?.frete);$('freteMoeda').value=p?.freteMoeda||'BRL';
+  $('notas').value=p?.notas||'';$('similar').value=p?.similar||'';
+  fotoAtual=p?.foto||'';mostrarFoto();$('err').textContent='';
+  $('salvar').disabled=false;previa();
+  $('form').classList.add('open');$('form').scrollTop=0;
+}
+
+function abrirDet(id){
+  const p=dados.find(x=>x.id===id);if(!p)return;detId=id;
+  const li=(t,v)=>v?`<dt>${t}</dt><dd>${esc(v)}</dd>`:'';
+  const linha=(t,x)=>{
+    if(!x)return `<dt>${t}</dt><dd>—</dd>`;
+    if(x.brl==null)return `<dt>${t}</dt><dd>${fmt(x.m,x.v)}<br><small>Sem cotação para converter</small></dd>`;
+    const extra=[];
+    if(x.pyg!=null)extra.push(fmt('PYG',x.pyg));
+    if(x.m!=='BRL')extra.push('informado em '+fmt(x.m,x.v));
+    return `<dt>${t}</dt><dd>${fmt('BRL',x.brl)}${extra.length?`<br><small>${extra.join(' · ')}</small>`:''}</dd>`;
+  };
+  const a=valores(p,'preco'),b=valores(p,'frete');
+  let total='';
+  if((a&&a.brl!=null)||(b&&b.brl!=null)){
+    const tb=(a?.brl||0)+(b?.brl||0);
+    const okPyg=[a,b].every(x=>!x||x.pyg!=null);
+    const tp=(a?.pyg||0)+(b?.pyg||0);
+    total=`<dt>Custo total</dt><dd><b>${fmt('BRL',tb)}</b>${okPyg?`<br><small>${fmt('PYG',tp)}</small>`:''}</dd>`;
+  }
+  $('detBody').innerHTML=`<img class="detail-img" src="${p.foto}">
+    <h2>${esc(p.nome)}</h2>
+    <dl class="dl">
+      ${li('Marca e linha',p.marca)}${li('Versão ou edição',p.versao)}${li('Gênero indicado',p.genero)}
+      ${li('Volume',p.volume)}${li('Fabricante ou distribuidor',p.fab)}
+      ${linha('Preço de compra',a)}${linha('Frete e impostos',b)}${total}
+      ${li('Fragrâncias',p.notas)}${li('Parecido com',p.similar)}
+    </dl>`;
+  $('det').classList.add('open');$('det').scrollTop=0;
+}
+
+$('novo').onclick=()=>abrirForm();
+$('cancelar').onclick=()=>$('form').classList.remove('open');
+$('fechar').onclick=()=>$('det').classList.remove('open');
+$('lista').onclick=e=>{const it=e.target.closest('.item');if(it)abrirDet(it.dataset.id)};
+$('busca').oninput=render;
+$('editar').onclick=()=>{const p=dados.find(x=>x.id===detId);$('det').classList.remove('open');abrirForm(p)};
+
+$('apagar').onclick=async()=>{
+  try{
+    await col.doc(detId).update({deletedAt:firebase.firestore.Timestamp.now()});
+    $('det').classList.remove('open');
+  }catch(e){alert('Erro ao mover para a lixeira: '+e.message)}
+};
+
+$('salvar').onclick=async()=>{
+  const nome=$('nome').value.trim();
+  if(!nome){$('err').textContent='Informe o nome do perfume.';return}
+  if(!fotoAtual){$('err').textContent='Adicione a foto do perfume.';return}
+  const o=editId?dados.find(x=>x.id===editId):null;
+  const campo=(c,inputId,moedaId)=>{
+    const v=num($(inputId).value),m=$(moedaId).value;
+    const out={[c]:v,[c+'Moeda']:m};
+    if(v===''){out[c+'BRL']=null;out[c+'PYG']=null;return out}
+    if(o&&o[c]===v&&(o[c+'Moeda']||'BRL')===m&&o[c+'BRL']!=null){
+      out[c+'BRL']=o[c+'BRL'];out[c+'PYG']=o[c+'PYG']??null;return out;
+    }
+    const k=converter(v,m);
+    if(!k)throw new Error('Sem cotação agora. Verifique a internet e tente de novo.');
+    out[c+'BRL']=k.brl;out[c+'PYG']=k.pyg;return out;
+  };
+  $('salvar').disabled=true;$('err').textContent='Salvando…';
+  try{
+    const p={nome,foto:fotoAtual,marca:$('marca').value.trim(),versao:$('versao').value.trim(),
+      genero:$('genero').value,volume:$('volume').value,fab:$('fab').value.trim(),
+      ...campo('preco','preco','precoMoeda'),...campo('frete','frete','freteMoeda'),
+      notas:$('notas').value.trim(),similar:$('similar').value.trim()};
+    if(editId)await col.doc(editId).update(p);
+    else await col.add({...p,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    $('form').classList.remove('open');
+  }catch(e){
+    $('err').textContent=e.message;
+    $('salvar').disabled=false;
+  }
+};
+
+/* ---------- backup ---------- */
+$('exp').onclick=()=>{
+  const out=dados.filter(p=>!p.deletedAt).map(({id,createdAt,deletedAt,...r})=>r);
+  const b=new Blob([JSON.stringify(out)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);
+  a.download='perfumes-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+};
+$('imp').onclick=()=>$('impFile').click();
+$('impFile').onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{
+    const arr=JSON.parse(await f.text());
+    if(!Array.isArray(arr))throw 0;
+    const n=await enviarLista(arr);
+    alert(n+' perfume(s) importado(s).');
+  }catch{alert('Arquivo de backup inválido.')}
+  e.target.value='';
+};
+async function enviarLista(arr){
+  const validos=arr.filter(x=>x&&x.nome&&x.foto);
+  let n=0;
+  for(let i=0;i<validos.length;i+=100){
+    const batch=db.batch();
+    validos.slice(i,i+100).forEach((x,k)=>{
+      const {id,createdAt,deletedAt,...r}=x;
+      batch.set(col.doc(),{...r,createdAt:firebase.firestore.Timestamp.fromMillis(Date.now()-(i+k))});
+      n++;
+    });
+    await batch.commit();
+  }
+  return n;
+}
+
+/* ---------- migração da versão local ---------- */
+function lerLocal(){try{const a=JSON.parse(localStorage.getItem(LOCAL_KEY)||'[]');return Array.isArray(a)?a:[]}catch{return[]}}
+function checarMigracao(){
+  const l=lerLocal();
+  $('migra').hidden=!l.length;
+  $('migraN').textContent=l.length;
+}
+$('migraBtn').onclick=async()=>{
+  const l=lerLocal();
+  $('migraBtn').disabled=true;
+  try{
+    const n=await enviarLista(l);
+    localStorage.removeItem(LOCAL_KEY);
+    alert(n+' perfume(s) enviados para a nuvem.');
+    checarMigracao();
+  }catch(e){alert('Erro ao enviar: '+e.message)}
+  $('migraBtn').disabled=false;
+};
+</script>
+</body>
+</html>
